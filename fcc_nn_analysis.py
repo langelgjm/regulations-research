@@ -163,9 +163,20 @@ def main():
     c = c.execute("SELECT id,text FROM fcc_nn WHERE id NOT IN (SELECT id FROM manual_code WHERE random_set < 3)")
     f = open(nn_class_file, 'w')
     for r in yield_sql_results(c, fetch_num=10000):
-        comment = process_ustr(dict(r)['text'])
-        classification = text_clf.predict([comment])
-        s = dict(r)['id'] + "," + classification[0] + "\n"
+        t = dict(r)['text']
+        cid = dict(r)['id']
+#        es = dict(r)['email_subject']
+        if t is not None:
+            comment = process_ustr(t)
+#        elif es is not none:
+#            comment = process_ustr(es) # Later, train a different classifier on email_subject
+        else:
+            comment = None
+        if comment is not None:
+            classification = text_clf.predict([comment])
+        else:
+            classification = ["u"] # unclassifiable
+        s = cid + "," + classification[0] + "\n"
         f.write(s)
     f.close()
     conn.close()
