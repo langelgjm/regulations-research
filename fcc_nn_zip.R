@@ -1,0 +1,22 @@
+zip <- read.csv("zip.csv", header=FALSE, colClasses=c("character", "factor", "integer"))
+colnames(zip) <- c("zip", "class", "count")
+zip <- zip[! zip$class=='na',]
+zip_totals <- aggregate(zip$count, by=list(zip$zip), FUN=sum)
+colnames(zip_totals) <- c("zip", "total")
+zip <- merge(zip, zip_totals, by="zip")
+total_o <- sum(zip[zip$class=='o',"count"])
+total_s <- sum(zip[zip$class=='s',"count"])
+total <- sum(zip$count)
+o_prop <- total_o / total
+s_prop <- total_s / total
+zip$prop <- zip$count / zip$total
+# There are currently a number of zip codes for which we have a support proportion, but not an oppose proportion, and vice versa
+# This is only true when the proportion is 1
+# Let's find those zips for which class is oppose, and prop is 1
+# Then replace them with class support and prop = 0, which is equivalent
+unique_oppose_rows <- zip$class=='o' & zip$prop==1
+zip[unique_oppose_rows, c("class", "count", "prop")] <- list(rep("s", sum(unique_oppose_rows)), rep(0, sum(unique_oppose_rows)), rep(0, sum(unique_oppose_rows)))
+# Now we can drop all the oppose rows, because we have the complementary support proportion in another row
+zip <- zip[zip$class=="s",]
+zip$exceeds_expected <- ifelse(zip$prop >= s_prop, TRUE, FALSE)
+write.csv(zip, "zip_clean.csv", row.names=FALSE)
