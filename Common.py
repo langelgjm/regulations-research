@@ -1,5 +1,5 @@
 from datetime import datetime
-from urllib import urlencode
+#from urllib import urlencode
 import sqlite3
 
 class Logfile(object):
@@ -16,7 +16,7 @@ class Logfile(object):
 		self.f.write(msg)
 		self.f.write("\n")
 		if self.disp:
-			print msg
+			print(msg)
 	def flush(self):
 		self.f.flush()
 	def name(self):
@@ -49,7 +49,9 @@ def yield_sql_results(cursor, fetch_num=1000):
 			yield result
 
 def get_sqlite_conn(filename):
-	return sqlite3.connect(filename)
+    conn = sqlite3.connect(filename)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def get_sql_row_as_dict(cursor, table, primary_key, primary_key_value):
 	'''

@@ -1,6 +1,6 @@
 library(ggplot2)
 library(scales)
-nn_dates <- read.csv("~/Documents/Regulations/regulations/nn_dates.csv", header=FALSE, stringsAsFactors=FALSE)
+nn_dates <- read.csv("~/Documents/_Works in Progress/Regulations/regulations/nn_dates.csv", header=FALSE, stringsAsFactors=FALSE)
 colnames(nn_dates) <- c("datestr", "class", "count")
 nn_dates$date <- as.Date(nn_dates$datestr, "%Y-%m-%d")
 # drop datestr
@@ -22,7 +22,7 @@ date_totals$class = "t"
 date_totals$transformed <- scale(sqrt(date_totals$count), center=FALSE, scale=sqrt(max(date_totals$count)))
 ggplot(nn_dates, aes(x=date, y=count, fill=class)) + 
   geom_bar(position="fill", stat="identity") + scale_fill_manual(values=c("#66c2a5", "#fc8d62", "#8da0cb", "#000000"), labels=c("Unclassifiable", "Oppose", "Support", "Volume")) + 
-  geom_line(data=date_totals,  aes(x=date, y=transformed, fill="Square Root of Volume")) +
+  geom_point(data=date_totals,  aes(x=date, y=transformed, fill="Square Root of Volume")) +
   scale_x_date(labels=date_format("%b-%d-%y")) +
   labs(x = "Date", y = "Proportion", fill="") + theme(legend.position="bottom")
 ggsave(filename="~/Documents/Regulations/article/nn_dates.pdf", width=9, height=5)
